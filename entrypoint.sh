@@ -18,6 +18,21 @@ S3_PATH=${S3_PATH:-nezha}
 WEBDAV_VENDOR=${WEBDAV_VENDOR:-other}
 WEBDAV_PATH=${WEBDAV_PATH:-nezha}
 
+# 如果没有设置存储类型，则默认退化为本地模式
+STORAGE_TYPE=${STORAGE_TYPE:-local}
+
+echo "[Init] 检查存储配置..."
+
+# ==========================================
+# 本地模式拦截
+# ==========================================
+if [ "${STORAGE_TYPE}" = "local" ]; then
+    echo "[Init] 存储类型设为 local 或未设置，跳过云端同步配置，仅使用本地数据运行。"
+    echo "[App] 启动 nezha 面板主程序..."
+    # 使用 exec 直接替换当前 bash 进程，不再执行后续任何云端同步代码
+    exec /dashboard/app
+fi
+
 echo "[Init] 正在生成 rclone 配置文件..."
 
 # ==========================================
@@ -59,7 +74,7 @@ EOF
     REMOTE_TARGET="backend:${WEBDAV_PATH}"
 
 else
-    echo "[Error] 未知的 STORAGE_TYPE，必须为 's3' 或 'webdav'。"
+    echo "[Error] 未知的 STORAGE_TYPE，必须为 's3'、'webdav' 或 'local'。"
     exit 1
 fi
 
