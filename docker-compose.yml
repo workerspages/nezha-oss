@@ -46,3 +46,5 @@ services:
       # ==========================================
       - ENCRYPT_PASSWORD=your_strong_password_here     # 自定义 AES-256 加密密码
       - ENCRYPT_SALT=your_random_salt_string_here      # 自定义加密盐值，增强安全性
+    volumes:
+      - ./data:/dashboard/data
