@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  dashboard:
+    # 如果您自行 Fork 并构建了项目，请将此处替换为您自己的 ghcr.io 镜像地址
+    image: ghcr.io/workerspages/nezha-oss:latest
+    container_name: nezha-dashboard-oss
+    restart: always
+    ports:
+      # 面板 Web 访问端口 (容器内部暴露为 8080)
+      - "8080:8080"
+      # Nezha Agent 客户端通过 RPC 通信连接的默认端口
+      - "5555:5555"
+    environment:
+      # ==========================================
+      # 【通用设置】
+      # ==========================================
+      # 同步间隔时长（分钟），默认为 5
+      - SYNC_INTERVAL=5
+      
+      # ==========================================
+      # 【存储配置：S3 模式】 
+      # (如需使用 WebDAV，请注释掉 S3 部分并启用下方 WebDAV 部分)
+      # ==========================================
+      - STORAGE_TYPE=s3
+      - S3_ENDPOINT=https://s3.us-east-1.amazonaws.com # 请替换为您实际的 S3 API 端点
+      - S3_ACCESS_KEY=your_access_key_here             # 您的 S3 Access Key
+      - S3_SECRET_KEY=your_secret_key_here             # 您的 S3 Secret Key
+      - S3_BUCKET=your_bucket_name                     # 您的 S3 存储桶名称
+      - S3_REGION=us-east-1                            # 存储桶所在区域 (默认 us-east-1)
+      - S3_PATH=nezha                                  # 存储桶内用于存放备份的子目录
+      
+      # ==========================================
+      # 【存储配置：WebDAV 模式】
+      # (取消下方注释以启用 WebDAV，并记得注释掉上方的 S3 模式)
+      # ==========================================
+      # - STORAGE_TYPE=webdav
+      # - WEBDAV_URL=https://dav.yourdomain.com/       # WebDAV 服务器地址
+      # - WEBDAV_USER=your_webdav_username             # WebDAV 用户名
+      # - WEBDAV_PASS=your_webdav_password             # WebDAV 密码
+      # - WEBDAV_VENDOR=other                          # 供应商类型 (nextcloud/owncloud/other)
+      # - WEBDAV_PATH=nezha                            # WebDAV 网盘内的存放子目录
+      
+      # ==========================================
+      # 【安全与加密配置】 (强烈推荐启用)
+      # 注意：首次启用加密时，云端目标路径必须为空目录！
+      # 密码一旦遗失，云端的备份将绝对无法解密恢复！
+      # ==========================================
+      - ENCRYPT_PASSWORD=your_strong_password_here     # 自定义 AES-256 加密密码
+      - ENCRYPT_SALT=your_random_salt_string_here      # 自定义加密盐值，增强安全性
